@@ -51,7 +51,7 @@ public class utilRobotConstants {
      */
     public static final class About {
         // Document Comments and any other 'About the Program' reference
-        public static final String COMMENT_AUTHOR_NAME = "FTC Team 11531 - Green Team";
+        public static final String COMMENT_AUTHOR_NAME = "FTC Team 18092 - Blue Team";
         public static final String COMMENT_SEASON_PERIOD = "2023 / 2024";
     }
 
@@ -92,7 +92,8 @@ public class utilRobotConstants {
         public static final String LABEL_INTAKE_MOTOR_STAGE_ONE = "stage_one_intake";
         public static final String LABEL_INTAKE_MOTOR_STAGE_TWO = "stage_two_intake";
 
-        public static final String LABEL_INTAKE_SERVO_SWEEPER = "sweeper_intake_servo";
+        public static final String LABEL_INTAKE_SERVO_SWEEPER_LEFT = "sweeper_left_intake_servo";
+        public static final String LABEL_INTAKE_SERVO_SWEEPER_RIGHT = "sweeper_right_intake_servo";
         public static final String LABEL_INTAKE_SERVO_SLOT_ONE = "slot_one_servo_intake";
         public static final String LABEL_INTAKE_SERVO_SLOT_TWO = "slot_two_servo_intake";
         public static final String LABEL_INTAKE_SERVO_PIVOT = "pivot_intake";
@@ -344,9 +345,9 @@ public class utilRobotConstants {
         public static final double SERVO_SLOTTWO_SETPOINT_CLOSE = 0.55;
 
         // Servo Settings - Endgame - Drone
-        public static final double SERVO_DRONE_LAUNCH_SETPOINT_INIT = 0.50;
-        public static final double SERVO_DRONE_LAUNCH_SETPOINT_OPEN = 0.20;
-        public static final double SERVO_DRONE_LAUNCH_SETPOINT_CLOSE = 0.60;
+        public static final double SERVO_DRONE_LAUNCH_SETPOINT_INIT = 0;
+        public static final double SERVO_DRONE_LAUNCH_SETPOINT_OPEN = 0.5;
+        public static final double SERVO_DRONE_LAUNCH_SETPOINT_CLOSE = 0;
 
         // Arm Settings
         public static final double ARM_MOTOR_OUTPUT_POWER_MAX = 0.75;
@@ -459,7 +460,7 @@ public class utilRobotConstants {
 
         // Lighting Enabled (True/False)
         // -- Only enabled if a lighting controller and lighting is installed on the robot
-        public static final boolean LIGHTING_ENABLED = false;
+        public static final boolean LIGHTING_ENABLED = true;
 
         // Hardware Settings based on the following [comments]:
         public static final String COMMENT_LIGHTING_CONTROLLER = "REV-11-1105 Blinkin LED Driver";
@@ -507,7 +508,7 @@ public class utilRobotConstants {
 
         // Light Patterns for Targeting
         public static final RevBlinkinLedDriver.BlinkinPattern LIGHT_PATTERN_TARGET_JUNCTION_ZONE_ACTIVE = RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT;
-        public static final RevBlinkinLedDriver.BlinkinPattern LIGHT_PATTERN_ALERT_ENDGAME = RevBlinkinLedDriver.BlinkinPattern.STROBE_RED;
+        public static final RevBlinkinLedDriver.BlinkinPattern LIGHT_PATTERN_ALERT_ENDGAME = RevBlinkinLedDriver.BlinkinPattern.BREATH_RED;
 
     }
 
