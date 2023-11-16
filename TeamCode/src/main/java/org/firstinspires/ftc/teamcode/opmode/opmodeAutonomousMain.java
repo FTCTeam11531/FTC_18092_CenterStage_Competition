@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.utility.utilRobotConstants;
  * </p>
  * <br>
  */
-@Autonomous(name = "Autonomous - Main", group = "smart", preselectTeleOp = "Teleop Main")
+@Autonomous(name = "Autonomous - Main", group = "_main", preselectTeleOp = "Teleop Main")
 //@Disabled
 public class opmodeAutonomousMain extends LinearOpMode {
     // ------------------------------------------------------------

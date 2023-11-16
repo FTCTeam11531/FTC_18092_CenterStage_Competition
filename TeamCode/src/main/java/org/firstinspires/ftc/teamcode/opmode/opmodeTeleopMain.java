@@ -28,7 +28,7 @@ import org.firstinspires.ftc.teamcode.utility.utilRobotConstants;
  * </p>
  * <br>
  */
-@TeleOp(name="Teleop Main", group="main")
+@TeleOp(name="Teleop Main", group="_main")
 //@Disabled
 public class opmodeTeleopMain extends LinearOpMode {
     // ------------------------------------------------------------
@@ -142,7 +142,7 @@ public class opmodeTeleopMain extends LinearOpMode {
         // ------------------------------------------------------------
         // Command Loop: run until the end of the match (driver presses STOP)
         // ------------------------------------------------------------
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()) {
 
             // ------------------------------------------------------------
             // Controls
@@ -181,9 +181,9 @@ public class opmodeTeleopMain extends LinearOpMode {
             // -- robot orientation to field
             // -- installed direction of control hub
             // -- orientation of drivetrain/motors
-            inputYaw =  -(gamepad1.right_stick_x);
-            inputAxial = gamepad1.left_stick_y;
-            inputLateral = -(gamepad1.left_stick_x);
+            inputYaw =  (gamepad1.right_stick_x);
+            inputAxial = -(gamepad1.left_stick_y);
+            inputLateral = (gamepad1.left_stick_x);
 
             // Drivetrain Type determined by 'Drivetrain Mode' enumeration selection (Default to Field Centric)
             if(sysDrivetrain.getLabelDrivetrainMode().equals(utilRobotConstants.Drivetrain.LIST_MODE_TYPE_DRIVETRAIN_ROBOTCENTRIC)) {
@@ -342,7 +342,16 @@ public class opmodeTeleopMain extends LinearOpMode {
             }
 
             if (gamepad1.back && gamepad2.back) {
+                double currentRuntime = getRuntime();
+
+                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_DRONE_PIVOT_SERVO_MAIN, utilRobotConstants.IntakeArm.SERVO_DRONE_PIVOT_SETPOINT_LAUNCH);
+                sleep(500);
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_DRONE_LAUNCH_SERVO_MAIN, utilRobotConstants.IntakeArm.SERVO_DRONE_LAUNCH_SETPOINT_OPEN);
+            }
+
+            if (gamepad1.start && gamepad2.start) {
+                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_DRONE_PIVOT_SERVO_MAIN, utilRobotConstants.IntakeArm.SERVO_DRONE_PIVOT_SETPOINT_INIT);
+                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_DRONE_LAUNCH_SERVO_MAIN, utilRobotConstants.IntakeArm.SERVO_DRONE_LAUNCH_SETPOINT_INIT);
             }
 
             // ------------------------------------------------------------

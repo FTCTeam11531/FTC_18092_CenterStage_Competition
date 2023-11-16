@@ -94,10 +94,10 @@ public class sysDrivetrainMecanum {
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
         // Reverse the right side motors
         // Reverse left motors if you are using NeveRests
-        leftFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotorEx.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        leftFrontDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
 
         // When using the newer IMU class be sure to initialize the IMU based on the orientation
         // of the Control Hub to the robot.
