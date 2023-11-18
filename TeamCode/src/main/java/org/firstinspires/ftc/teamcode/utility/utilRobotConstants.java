@@ -405,7 +405,7 @@ public class utilRobotConstants {
 
         // AI Camera Setpoints - Target Zone(s)
         public static final int RANDOM_TARGET_ZONE_ONE_X = 100;
-        public static final int RANDOM_TARGET_ZONE_TWO_X = 200;
+        public static final int RANDOM_TARGET_ZONE_TWO_X = 300;
         public static final int RANDOM_TARGET_ZONE_THREE_X = 320;
 
 

@@ -325,7 +325,7 @@ public class opmodeTeleopMain extends LinearOpMode {
             // Override
             // ------------------------------------------------------------
             // Button Action - Reset Heading Override (and Raw)
-            if(gamepad1.dpad_up && gamepad1.x) {
+            if(gamepad1.start && gamepad1.y) {
 
                 // Reset the Robot Heading (normally done on init of Drivetrain system)
                 sysDrivetrain.resetZeroRobotHeading();
