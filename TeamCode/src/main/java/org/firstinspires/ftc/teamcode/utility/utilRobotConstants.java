@@ -80,6 +80,10 @@ public class utilRobotConstants {
         public static final String LABEL_CONTROLHUB_IMU = "imu_ch";
         public static final String LABEL_EXPANSIONHUB_IMU = "imu_eh";
 
+        public static final String LABEL_DRIVETRAIN_ENCODER_LEFT = LABEL_DRIVETRAIN_MOTOR_LEFT_FRONT;
+        public static final String LABEL_DRIVETRAIN_ENCODER_RIGHT = LABEL_DRIVETRAIN_MOTOR_RIGHT_FRONT;
+        public static final String LABEL_DRIVETRAIN_ENCODER_REAR = LABEL_DRIVETRAIN_MOTOR_LEFT_BACK;
+
         public static final RevHubOrientationOnRobot.LogoFacingDirection CONTROLHUB_LOGO_DIRECTION = RevHubOrientationOnRobot.LogoFacingDirection.UP;
         public static final RevHubOrientationOnRobot.UsbFacingDirection CONTROLHUB_USB_DIRECTION = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
@@ -100,6 +104,7 @@ public class utilRobotConstants {
 
         public static final String LABEL_INTAKE_SENSOR_SLOT_ONE = "slot_one_sensor_intake";
         public static final String LABEL_INTAKE_SENSOR_SLOT_TWO = "slot_two_sensor_intake";
+        public static final String LABEL_INTAKE_SENSOR_TRACKING = "intake_tracker_sensor";
 
         // Arm
         public static final String LABEL_ARM_MOTOR_LEFT_SIDE = "left_side_arm";
@@ -107,6 +112,7 @@ public class utilRobotConstants {
 
         // Endgame - Drone
         public static final String LABEL_DRONE_LAUNCH_SERVO_MAIN = "drone_launch_servo";
+        public static final String LABEL_DRONE_PIVOT_SERVO_MAIN = "drone_pivot_servo";
 
         // Vision
         public static final String LABEL_FRONT_AI_CAMERA = "front_ai_camera";
@@ -349,6 +355,9 @@ public class utilRobotConstants {
         public static final double SERVO_DRONE_LAUNCH_SETPOINT_OPEN = 0.5;
         public static final double SERVO_DRONE_LAUNCH_SETPOINT_CLOSE = 0;
 
+        public static final double SERVO_DRONE_PIVOT_SETPOINT_INIT = 0.50;
+        public static final double SERVO_DRONE_PIVOT_SETPOINT_LAUNCH = 0.70;
+
         // Arm Settings
         public static final double ARM_MOTOR_OUTPUT_POWER_MAX = 0.75;
         public static final double ARM_MOTOR_OUTPUT_POWER_MIN = 0.25;
@@ -396,7 +405,7 @@ public class utilRobotConstants {
 
         // AI Camera Setpoints - Target Zone(s)
         public static final int RANDOM_TARGET_ZONE_ONE_X = 100;
-        public static final int RANDOM_TARGET_ZONE_TWO_X = 200;
+        public static final int RANDOM_TARGET_ZONE_TWO_X = 300;
         public static final int RANDOM_TARGET_ZONE_THREE_X = 320;
 
 

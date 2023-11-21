@@ -51,7 +51,7 @@ public class sysVision {
         }
 
         // Initialize in April Tag Mode
-        frontAICamera.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
+        setAICameraMode(utilRobotConstants.Vision.AI_Camera.AI_CAMERA_MODE_OBJECT_TRACKING);
 
         sysOpMode.telemetry.addData("Alliance Color", getDetectedAllianceTagColor());
 
