@@ -237,9 +237,9 @@ public class utilRobotConstants {
         public static final double MOTOR_OUTPUT_POWER_MAX = 1;
 
         public static final double MOTOR_OUTPUT_POWER_HIGH = 1;
-        public static final double MOTOR_OUTPUT_POWER_MED = 0.75;
-        public static final double MOTOR_OUTPUT_POWER_LOW = 0.50;
-        public static final double MOTOR_OUTPUT_POWER_SNAIL = 0.15;
+        public static final double MOTOR_OUTPUT_POWER_MED = 0.85;
+        public static final double MOTOR_OUTPUT_POWER_LOW = 0.40;
+        public static final double MOTOR_OUTPUT_POWER_SNAIL = 0.25;
 
         /**
          * <h2>Convert: Encoder Ticks to Inches</h2>
@@ -336,19 +336,20 @@ public class utilRobotConstants {
         public static final double SERVO_INTAKE_SWEEPER_SETPOINT_REVERSE_FULL = -1.0;
 
         // Servo Settings - Pivot
-        public static final double SERVO_PIVOT_SETPOINT_HOME = 0.25;
-        public static final double SERVO_PIVOT_SETPOINT_BOARD = 0.50;
+        public static final double SERVO_PIVOT_SETPOINT_HOME = 0.5;
+        public static final double SERVO_PIVOT_SETPOINT_TRAVEL = 1.0;
+        public static final double SERVO_PIVOT_SETPOINT_BOARD = 1.0;
 
         // Servo Settings - Pixel Slot
-        public static final double SERVO_SLOTONE_SETPOINT_INIT = 0.50;
-        public static final double SERVO_SLOTONE_SETPOINT_OPEN = 0.60;
+        public static final double SERVO_SLOTONE_SETPOINT_INIT = 1.0;
+        public static final double SERVO_SLOTONE_SETPOINT_OPEN = 0.5;
 
-        public static final double SERVO_SLOTONE_SETPOINT_CLOSE = 0.45;
+        public static final double SERVO_SLOTONE_SETPOINT_CLOSE = 1.0;
 
-        public static final double SERVO_SLOTTWO_SETPOINT_INIT = 0.50;
-        public static final double SERVO_SLOTTWO_SETPOINT_OPEN = 0.40;
+        public static final double SERVO_SLOTTWO_SETPOINT_INIT = 0.0;
+        public static final double SERVO_SLOTTWO_SETPOINT_OPEN = 0.5;
 
-        public static final double SERVO_SLOTTWO_SETPOINT_CLOSE = 0.55;
+        public static final double SERVO_SLOTTWO_SETPOINT_CLOSE = 0.0;
 
         // Servo Settings - Endgame - Drone
         public static final double SERVO_DRONE_LAUNCH_SETPOINT_INIT = 0;
@@ -359,8 +360,8 @@ public class utilRobotConstants {
         public static final double SERVO_DRONE_PIVOT_SETPOINT_LAUNCH = 0.70;
 
         // Arm Settings
-        public static final double ARM_MOTOR_OUTPUT_POWER_MAX = 0.75;
-        public static final double ARM_MOTOR_OUTPUT_POWER_MIN = 0.25;
+        public static final double ARM_MOTOR_OUTPUT_POWER_MAX = 1.0;
+        public static final double ARM_MOTOR_OUTPUT_POWER_MIN = 0.85;
 
         // Arm - Setpoints
         public static final int ARM_ENCODER_SETPOINT_HOME = 0;

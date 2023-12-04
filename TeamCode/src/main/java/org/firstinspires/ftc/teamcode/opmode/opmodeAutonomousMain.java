@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -25,7 +26,7 @@ import org.firstinspires.ftc.teamcode.utility.utilRobotConstants;
  * <br>
  */
 @Autonomous(name = "tst: Camera", group = "_tst", preselectTeleOp = "Teleop Main")
-//@Disabled
+@Disabled
 public class opmodeAutonomousMain extends LinearOpMode {
     // ------------------------------------------------------------
     // System(s) - Define system and create instance of each system

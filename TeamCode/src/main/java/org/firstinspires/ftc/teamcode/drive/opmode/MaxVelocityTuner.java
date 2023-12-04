@@ -27,7 +27,7 @@ import java.util.Objects;
  */
 @Config
 @Autonomous(name = "rr: MaxVelocityTuner" , group = "rr_drive")
-@Disabled
+//@Disabled
 public class MaxVelocityTuner extends LinearOpMode {
     public static double RUNTIME = 2.0;
 
