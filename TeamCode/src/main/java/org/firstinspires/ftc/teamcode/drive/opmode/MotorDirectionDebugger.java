@@ -40,7 +40,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  */
 @Config
 @TeleOp(name = "rr: MotorDirectionDebugger" , group = "rr_drive")
-//@Disabled // was disabled by default
+@Disabled // was disabled by default
 public class MotorDirectionDebugger extends LinearOpMode {
     public static double MOTOR_POWER = 0.7;
 

@@ -95,13 +95,14 @@ public class opmodeTeleopMain extends LinearOpMode {
         // Variables for OpMode
         // ------------------------------------------------------------
         double inputAxial, inputLateral, inputYaw;
-        boolean isManualSlideMode = false;
+        boolean isManualSlideMode = false, isManualIntakeMode = false;
 
         // ------------------------------------------------------------
         // Send telemetry message to signify robot completed initialization and waiting to start;
         // ------------------------------------------------------------
         telemetry.addData(">", "------------------------------------");
         telemetry.addData(">", "All Systems Ready - Waiting to Start");
+        telemetry.addData(">", "------------------------------------");
         telemetry.update();
 
         // Reset runtime clock
@@ -242,33 +243,52 @@ public class opmodeTeleopMain extends LinearOpMode {
             // ------------------------------------------------------------
             // Intake / Arm
             // ------------------------------------------------------------
+            // Slow arm down when below hang setpoint (not manual) to help resist overdrive
+            if(!isManualSlideMode) {
+                if (sysIntakeArm.getArmCurrentPosition(utilRobotConstants.Configuration.LABEL_ARM_MOTOR_LEFT_SIDE) <= utilRobotConstants.IntakeArm.ARM_ENCODER_SETPOINT_HANG) {
+                    sysIntakeArm.setArmMotorPower(utilRobotConstants.IntakeArm.ARM_MOTOR_OUTPUT_POWER_MIN);
+                } else {
+                    sysIntakeArm.setArmMotorPower(utilRobotConstants.IntakeArm.ARM_MOTOR_OUTPUT_POWER_MAX);
+                }
+            }
+
+            // Cradle - Home/Ground
             if(gamepad1.a) {
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE, utilRobotConstants.IntakeArm.SERVO_SLOTONE_SETPOINT_OPEN);
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO, utilRobotConstants.IntakeArm.SERVO_SLOTTWO_SETPOINT_OPEN);
-                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT, utilRobotConstants.IntakeArm.SERVO_PIVOT_SETPOINT_HOME);
+                sysIntakeArm.moveIntakeToTarget(utilRobotConstants.IntakeArm.INTAKE_ENCODER_SETPOINT_HOME, utilRobotConstants.IntakeArm.INTAKE_MOTOR_OUTPUT_POWER_MIN);
             }
 
+            // Cradle - Travel Mode
             if(gamepad1.left_bumper) {
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE, utilRobotConstants.IntakeArm.SERVO_SLOTONE_SETPOINT_CLOSE);
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO, utilRobotConstants.IntakeArm.SERVO_SLOTTWO_SETPOINT_CLOSE);
-                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT, utilRobotConstants.IntakeArm.SERVO_PIVOT_SETPOINT_TRAVEL);
+                sysIntakeArm.moveIntakeToTarget(utilRobotConstants.IntakeArm.INTAKE_ENCODER_SETPOINT_TRAVEL, utilRobotConstants.IntakeArm.INTAKE_MOTOR_OUTPUT_POWER_MAX);
             }
 
+            // Cradle - Board
             if(gamepad2.left_bumper) {
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE, utilRobotConstants.IntakeArm.SERVO_SLOTONE_SETPOINT_CLOSE);
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO, utilRobotConstants.IntakeArm.SERVO_SLOTTWO_SETPOINT_CLOSE);
-                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT, utilRobotConstants.IntakeArm.SERVO_PIVOT_SETPOINT_BOARD);
+                sysIntakeArm.moveIntakeToTarget(utilRobotConstants.IntakeArm.INTAKE_ENCODER_SETPOINT_BOARD, utilRobotConstants.IntakeArm.INTAKE_MOTOR_OUTPUT_POWER_MAX);
             }
 
+            // Cradle - Close
+            if(Math.abs(gamepad1.left_trigger) >= .25) {
+                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE, utilRobotConstants.IntakeArm.SERVO_SLOTONE_SETPOINT_CLOSE);
+                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO, utilRobotConstants.IntakeArm.SERVO_SLOTTWO_SETPOINT_CLOSE);
+            }
+
+            // Cradle - Release
             if(gamepad2.right_bumper) {
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE, utilRobotConstants.IntakeArm.SERVO_SLOTONE_SETPOINT_OPEN);
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO, utilRobotConstants.IntakeArm.SERVO_SLOTTWO_SETPOINT_OPEN);
             }
 
-            if(Math.abs(gamepad2.right_trigger) > .10) {
-                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE, utilRobotConstants.IntakeArm.SERVO_SLOTONE_SETPOINT_CLOSE);
-                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO, utilRobotConstants.IntakeArm.SERVO_SLOTTWO_SETPOINT_CLOSE);
-            }
+//            if(Math.abs(gamepad2.right_trigger) > .10) {
+//                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE, utilRobotConstants.IntakeArm.SERVO_SLOTONE_SETPOINT_CLOSE);
+//                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO, utilRobotConstants.IntakeArm.SERVO_SLOTTWO_SETPOINT_CLOSE);
+//            }
 
 //            if(gamepad2.dpad_up) {
 //                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE, sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE) - 0.05);
@@ -278,10 +298,16 @@ public class opmodeTeleopMain extends LinearOpMode {
 //                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE, sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE) + 0.05);
 //            }
 
+            // Arm - Manual Control
             if(Math.abs(gamepad2.right_stick_y) >= .25) {
                 isManualSlideMode = true;
                 if(sysIntakeArm.getArmCurrentPosition(utilRobotConstants.Configuration.LABEL_ARM_MOTOR_LEFT_SIDE) >= 0 && sysIntakeArm.getArmCurrentPosition(utilRobotConstants.Configuration.LABEL_ARM_MOTOR_LEFT_SIDE) <= utilRobotConstants.IntakeArm.ARM_ENCODER_SETPOINT_MAX) {
-                    sysIntakeArm.moveArmManually(-(gamepad2.right_stick_y), utilRobotConstants.IntakeArm.ARM_MOTOR_OUTPUT_POWER_MIN);
+                    if(sysIntakeArm.getLimitSensorTripped(utilRobotConstants.Configuration.LABEL_ARM_SENSOR_LIMIT_LOWER)) {
+                        sysIntakeArm.moveArmManually(-(Math.abs(gamepad2.right_stick_y)), utilRobotConstants.IntakeArm.ARM_MOTOR_OUTPUT_POWER_MIN);
+                    }
+                    else {
+                        sysIntakeArm.moveArmManually(-(gamepad2.right_stick_y), utilRobotConstants.IntakeArm.ARM_MOTOR_OUTPUT_POWER_MIN);
+                    }
                 }
             }
             else {
@@ -290,34 +316,77 @@ public class opmodeTeleopMain extends LinearOpMode {
                 }
             }
 
+            // Arm Setpoint - High
             if(gamepad2.y) {
                 isManualSlideMode = false;
-                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT, utilRobotConstants.IntakeArm.SERVO_PIVOT_SETPOINT_BOARD);
+                isManualIntakeMode = false;
+                sysIntakeArm.moveIntakeToTarget(utilRobotConstants.IntakeArm.INTAKE_ENCODER_SETPOINT_BOARD, utilRobotConstants.IntakeArm.INTAKE_MOTOR_OUTPUT_POWER_MAX);
                 sysIntakeArm.moveArmToTarget(utilRobotConstants.IntakeArm.ARM_ENCODER_SETPOINT_MAX, utilRobotConstants.IntakeArm.ARM_MOTOR_OUTPUT_POWER_MAX);
             }
 
+            // Arm Setpoint - Hang
             if(gamepad2.x) {
                 isManualSlideMode = false;
+                isManualIntakeMode = false;
                 sysIntakeArm.moveArmToTarget(utilRobotConstants.IntakeArm.ARM_ENCODER_SETPOINT_HANG, utilRobotConstants.IntakeArm.ARM_MOTOR_OUTPUT_POWER_MAX);
             }
 
+            // Arm Setpoint - Pre-Climb
             if(gamepad2.b) {
                 isManualSlideMode = false;
+                isManualIntakeMode = false;
                 sysIntakeArm.moveArmToTarget(utilRobotConstants.IntakeArm.ARM_ENCODER_SETPOINT_PRECLIMB, utilRobotConstants.IntakeArm.ARM_MOTOR_OUTPUT_POWER_MAX);
             }
 
+            // Arm Setpoint - Home
             if(gamepad2.a) {
                 isManualSlideMode = false;
+                isManualIntakeMode = false;
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE, utilRobotConstants.IntakeArm.SERVO_SLOTONE_SETPOINT_OPEN);
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO, utilRobotConstants.IntakeArm.SERVO_SLOTTWO_SETPOINT_OPEN);
-                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT, utilRobotConstants.IntakeArm.SERVO_PIVOT_SETPOINT_HOME);
+                sysIntakeArm.moveIntakeToTarget(utilRobotConstants.IntakeArm.INTAKE_ENCODER_SETPOINT_HOME, utilRobotConstants.IntakeArm.INTAKE_MOTOR_OUTPUT_POWER_MIN);
                 sysIntakeArm.moveArmToTarget(utilRobotConstants.IntakeArm.ARM_ENCODER_SETPOINT_HOME, utilRobotConstants.IntakeArm.ARM_MOTOR_OUTPUT_POWER_MIN);
             }
+
+            // Intake Pivot - Manual Control
+            if(Math.abs(gamepad2.left_stick_y) >= .25) {
+                isManualIntakeMode = true;
+                if(sysIntakeArm.getIntakeCurrentPosition(utilRobotConstants.Configuration.LABEL_INTAKE_MOTOR_PIVOT) >= utilRobotConstants.IntakeArm.INTAKE_ENCODER_SETPOINT_HOME &&
+                        sysIntakeArm.getIntakeCurrentPosition(utilRobotConstants.Configuration.LABEL_INTAKE_MOTOR_PIVOT) <= utilRobotConstants.IntakeArm.INTAKE_ENCODER_SETPOINT_MAX){
+                    sysIntakeArm.moveIntakeManually(-(gamepad2.left_stick_y), utilRobotConstants.IntakeArm.INTAKE_MOTOR_OUTPUT_POWER_MIN);
+                }
+            }
+            else {
+                if(isManualIntakeMode) {
+                    sysIntakeArm.moveIntakeManually(0, utilRobotConstants.IntakeArm.INTAKE_MOTOR_OUTPUT_POWER_MIN);
+                }
+            }
+
+            // Manual Control of pixel cradle - to board
+//            if(gamepad2.dpad_up) {
+//
+//                if(sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT) <= utilRobotConstants.IntakeArm.SERVO_PIVOT_SETPOINT_BOARD) {
+//                    sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT, sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT) + 0.05);
+//                }
+//
+//            }
+//
+//            // Manual Control of pixel cradle - to home
+//            if(gamepad2.dpad_down) {
+//
+//                if(sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT) >= utilRobotConstants.IntakeArm.SERVO_PIVOT_SETPOINT_HOME) {
+//                    sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT, sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT) - 0.05);
+//                }
+//
+//            }
 
             // ------------------------------------------------------------
             // Vision
             // ------------------------------------------------------------
 
+            // ------------------------------------------------------------
+            // Sensor
+            // ------------------------------------------------------------
 
 
             // ------------------------------------------------------------
@@ -330,7 +399,7 @@ public class opmodeTeleopMain extends LinearOpMode {
                 sysDrivetrain.resetZeroRobotHeading();
 
                 // Cycle Pause
-                sleep(utilRobotConstants.CommonSettings.SLEEP_TIMER_MILLISECONDS_DEFAULT);
+//                sleep(utilRobotConstants.CommonSettings.SLEEP_TIMER_MILLISECONDS_DEFAULT);
             }
 
             // ------------------------------------------------------------
@@ -341,114 +410,137 @@ public class opmodeTeleopMain extends LinearOpMode {
             }
 
             if (gamepad1.back && gamepad2.back) {
-                double currentRuntime = getRuntime();
-
                 sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_DRONE_PIVOT_SERVO_MAIN, utilRobotConstants.IntakeArm.SERVO_DRONE_PIVOT_SETPOINT_LAUNCH);
-                sleep(500);
-                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_DRONE_LAUNCH_SERVO_MAIN, utilRobotConstants.IntakeArm.SERVO_DRONE_LAUNCH_SETPOINT_OPEN);
             }
 
             if (gamepad1.start && gamepad2.start) {
-                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_DRONE_PIVOT_SERVO_MAIN, utilRobotConstants.IntakeArm.SERVO_DRONE_PIVOT_SETPOINT_INIT);
-                sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_DRONE_LAUNCH_SERVO_MAIN, utilRobotConstants.IntakeArm.SERVO_DRONE_LAUNCH_SETPOINT_INIT);
+
+                // Only allow the launch if the pivot servo is open
+                if(sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_DRONE_PIVOT_SERVO_MAIN) == utilRobotConstants.IntakeArm.SERVO_DRONE_PIVOT_SETPOINT_LAUNCH) {
+                    sysIntakeArm.setIntakeServoPosition(utilRobotConstants.Configuration.LABEL_DRONE_LAUNCH_SERVO_MAIN, utilRobotConstants.IntakeArm.SERVO_DRONE_LAUNCH_SETPOINT_OPEN);
+                }
             }
 
             // ------------------------------------------------------------
             // Driver Hub Feedback
             // ------------------------------------------------------------
+            telemetry.addData("-", "------------------------------");
             telemetry.addData("Run Time", runtime.toString());
 
-            // ------------------------------------------------------------
-            // - Gamepad telemetry
-            // ------------------------------------------------------------
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("-", "-- Gamepad");
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("Gamepad 1 - [Y] Axial", "%4.2f", gamepad1.left_stick_y);
-            telemetry.addData("Gamepad 1 - [X] Lateral", "%4.2f", gamepad1.left_stick_x);
-            telemetry.addData("Gamepad 1 - [R] Rotation", "%4.2f", gamepad1.right_stick_x);
-
-            // ------------------------------------------------------------
-            // - Drivetrain telemetry
-            // ------------------------------------------------------------
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("-", "-- Drivetrain");
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("Drivetrain Mode", sysDrivetrain.getLabelDrivetrainMode());
-            telemetry.addData("Drivetrain Power", sysDrivetrain.getLabelDrivetrainOutputPower());
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("Power Front left/Right", "%4.2f, %4.2f"
-                    , sysDrivetrain.getDrivetrainMotorPower(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_LEFT_FRONT)
-                    , sysDrivetrain.getDrivetrainMotorPower(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_RIGHT_FRONT));
-            telemetry.addData("Power Back  left/Right", "%4.2f, %4.2f"
-                    , sysDrivetrain.getDrivetrainMotorPower(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_LEFT_BACK)
-                    , sysDrivetrain.getDrivetrainMotorPower(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_RIGHT_BACK));
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("Encoder Front left/Right", "%7d, %7d"
-                    , sysDrivetrain.getDrivetrainMotorEncoderPosition(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_LEFT_FRONT)
-                    , sysDrivetrain.getDrivetrainMotorEncoderPosition(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_RIGHT_FRONT));
-            telemetry.addData("Encoder Back  left/Right", "%7d, %7d"
-                    , sysDrivetrain.getDrivetrainMotorEncoderPosition(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_LEFT_BACK)
-                    , sysDrivetrain.getDrivetrainMotorEncoderPosition(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_RIGHT_BACK));
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("Robot Heading Raw", sysDrivetrain.getRobotHeadingRaw());
-            telemetry.addData("Heading Adjustment", utilRobotConstants.CommonSettings.getImuTransitionAdjustment());
-            telemetry.addData("Robot Heading (Adjusted)", sysDrivetrain.getRobotHeadingAdj());
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("Robot Angle - Yaw (Z)", sysDrivetrain.getRobotAngles().getYaw(AngleUnit.DEGREES));
-            telemetry.addData("Robot Angle - Pitch (X)", sysDrivetrain.getRobotAngles().getPitch(AngleUnit.DEGREES));
-            telemetry.addData("Robot Angle - Yaw (Z)", sysDrivetrain.getRobotAngles().getRoll(AngleUnit.DEGREES));
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("Robot Angle Velocity - Yaw (Z)", sysDrivetrain.getRobotAngularVelocity().zRotationRate);
-            telemetry.addData("Robot Angle Velocity - Pitch (X)", sysDrivetrain.getRobotAngularVelocity().xRotationRate);
-            telemetry.addData("Robot Angle Velocity - Yaw (Z)", sysDrivetrain.getRobotAngularVelocity().yRotationRate);
-
-            // ------------------------------------------------------------
-            // - Vision telemetry
-            // ------------------------------------------------------------
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("-", "-- Vision");
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("Camera Block Count", sysVision.getCameraObjectList().length);
-            telemetry.addData("Alliance Color", sysVision.getDetectedAllianceTagColor());
-//            telemetry.addData("R-G-B", "%4, %4, %4"
-//                    , sysVision.getAllianceTagColorLevel("red")
-//                    , sysVision.getAllianceTagColorLevel("green")
-//                    , sysVision.getAllianceTagColorLevel("blue"));
-
-            // ------------------------------------------------------------
-            // - Intake / Arm telemetry
-            // ------------------------------------------------------------
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("-", "-- Intake / Arm");
-            telemetry.addData("-", "------------------------------");
-            telemetry.addData("Pivot Position", sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT));
-            telemetry.addData("Slot One Position", sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE));
-            telemetry.addData("Slot Two Position", sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO));
-            telemetry.addData("Arm Position - Left", sysIntakeArm.getArmCurrentPosition(utilRobotConstants.Configuration.LABEL_ARM_MOTOR_LEFT_SIDE));
-            telemetry.addData("Arm Position - Right", sysIntakeArm.getArmCurrentPosition(utilRobotConstants.Configuration.LABEL_ARM_MOTOR_RIGHT_SIDE));
-
-            // ------------------------------------------------------------
-            // - Lighting telemetry
-            // ------------------------------------------------------------
-            if(utilRobotConstants.Configuration.ENABLE_LIGHTING) {
-                telemetry.addData("-", "------------------------------");
-                telemetry.addData("-", "-- Lighting");
-                telemetry.addData("-", "------------------------------");
-                telemetry.addData("Pattern", sysLighting.ledLightPattern.toString());
-            }
+//            // ------------------------------------------------------------
+//            // - Gamepad telemetry
+//            // ------------------------------------------------------------
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("-", "-- Gamepad");
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("Gamepad 1 - [Y] Axial", "%4.2f", gamepad1.left_stick_y);
+//            telemetry.addData("Gamepad 1 - [X] Lateral", "%4.2f", gamepad1.left_stick_x);
+//            telemetry.addData("Gamepad 1 - [R] Rotation", "%4.2f", gamepad1.right_stick_x);
+//
+//            // ------------------------------------------------------------
+//            // - Drivetrain telemetry
+//            // ------------------------------------------------------------
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("-", "-- Drivetrain");
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("Drivetrain Mode", sysDrivetrain.getLabelDrivetrainMode());
+//            telemetry.addData("Drivetrain Power", sysDrivetrain.getLabelDrivetrainOutputPower());
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("Power Front left/Right", "%4.2f, %4.2f"
+//                    , sysDrivetrain.getDrivetrainMotorPower(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_LEFT_FRONT)
+//                    , sysDrivetrain.getDrivetrainMotorPower(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_RIGHT_FRONT));
+//            telemetry.addData("Power Back  left/Right", "%4.2f, %4.2f"
+//                    , sysDrivetrain.getDrivetrainMotorPower(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_LEFT_BACK)
+//                    , sysDrivetrain.getDrivetrainMotorPower(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_RIGHT_BACK));
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("Encoder Front left/Right", "%7d, %7d"
+//                    , sysDrivetrain.getDrivetrainMotorEncoderPosition(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_LEFT_FRONT)
+//                    , sysDrivetrain.getDrivetrainMotorEncoderPosition(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_RIGHT_FRONT));
+//            telemetry.addData("Encoder Back  left/Right", "%7d, %7d"
+//                    , sysDrivetrain.getDrivetrainMotorEncoderPosition(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_LEFT_BACK)
+//                    , sysDrivetrain.getDrivetrainMotorEncoderPosition(utilRobotConstants.Configuration.LABEL_DRIVETRAIN_MOTOR_RIGHT_BACK));
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("Robot Heading Raw", sysDrivetrain.getRobotHeadingRaw());
+//            telemetry.addData("Heading Adjustment", utilRobotConstants.CommonSettings.getImuTransitionAdjustment());
+//            telemetry.addData("Robot Heading (Adjusted)", sysDrivetrain.getRobotHeadingAdj());
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("Robot Angle - Yaw (Z)", sysDrivetrain.getRobotAngles().getYaw(AngleUnit.DEGREES));
+//            telemetry.addData("Robot Angle - Pitch (X)", sysDrivetrain.getRobotAngles().getPitch(AngleUnit.DEGREES));
+//            telemetry.addData("Robot Angle - Yaw (Z)", sysDrivetrain.getRobotAngles().getRoll(AngleUnit.DEGREES));
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("Robot Angle Velocity - Yaw (Z)", sysDrivetrain.getRobotAngularVelocity().zRotationRate);
+//            telemetry.addData("Robot Angle Velocity - Pitch (X)", sysDrivetrain.getRobotAngularVelocity().xRotationRate);
+//            telemetry.addData("Robot Angle Velocity - Yaw (Z)", sysDrivetrain.getRobotAngularVelocity().yRotationRate);
+//
+//            // ------------------------------------------------------------
+//            // - Vision telemetry
+//            // ------------------------------------------------------------
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("-", "-- Vision");
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("Camera Block Count", sysVision.getCameraObjectList().length);
+//            telemetry.addData("Alliance Color", sysVision.getDetectedAllianceTagColor());
+////            telemetry.addData("R-G-B", "%4, %4, %4"
+////                    , sysVision.getAllianceTagColorLevel("red")
+////                    , sysVision.getAllianceTagColorLevel("green")
+////                    , sysVision.getAllianceTagColorLevel("blue"));
+//
+//            // ------------------------------------------------------------
+//            // - Intake / Arm telemetry
+//            // ------------------------------------------------------------
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("-", "-- Intake / Arm");
+//            telemetry.addData("-", "------------------------------");
+//            telemetry.addData("Pivot Position", sysIntakeArm.getArmCurrentPosition(utilRobotConstants.Configuration.LABEL_INTAKE_MOTOR_PIVOT));
+//            telemetry.addData("Slot One Position", sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE));
+//            telemetry.addData("Slot Two Position", sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO));
+//            telemetry.addData("Arm Position - Left", sysIntakeArm.getArmCurrentPosition(utilRobotConstants.Configuration.LABEL_ARM_MOTOR_LEFT_SIDE));
+//            telemetry.addData("Arm Position - Right", sysIntakeArm.getArmCurrentPosition(utilRobotConstants.Configuration.LABEL_ARM_MOTOR_RIGHT_SIDE));
+//
+//            // ------------------------------------------------------------
+//            // - Lighting telemetry
+//            // ------------------------------------------------------------
+//            if(utilRobotConstants.Configuration.ENABLE_LIGHTING) {
+//                telemetry.addData("-", "------------------------------");
+//                telemetry.addData("-", "-- Lighting");
+//                telemetry.addData("-", "------------------------------");
+//                telemetry.addData("Pattern", sysLighting.ledLightPattern.toString());
+//            }
 
             // ------------------------------------------------------------
             // - send telemetry to driver hub
             // ------------------------------------------------------------
+            telemetry.addData("-", "------------------------------");
+            telemetry.addData("-", "(reset robot)");
+            telemetry.addData("-", "-- If you see an I2C error");
+            telemetry.addData("-", "");
+            telemetry.addData("-", "(change battery)");
+            telemetry.addData("-", "-- if expansion hub loses connection");
+            telemetry.addData("-", "-- if voltage below 12v");
+            telemetry.addData("-", "");
+            telemetry.addData("-", "Take your time!");
+            telemetry.addData("-", "");
+            telemetry.addData("-", "Drive with care and caution");
+            telemetry.addData("-", "");
+            telemetry.addData("-", "Don't drive like you stole it");
+            telemetry.addData("-", "");
+            telemetry.addData("-", "------------------------------");
+            telemetry.addData("-", "-- Stuff you should know!");
+            telemetry.addData("-", "------------------------------");
+            telemetry.addData("Pivot Position", sysIntakeArm.getIntakeCurrentPosition(utilRobotConstants.Configuration.LABEL_INTAKE_MOTOR_PIVOT));
+            telemetry.addData("Slot One Position", sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE));
+            telemetry.addData("Slot Two Position", sysIntakeArm.getIntakeServoPosition(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO));
+            telemetry.addData("-", "------------------------------");
+
+            telemetry.update();
 
             // Input assignment to 'pause' telemetry update(s)
-            if (!gamepad1.dpad_right) {
+//            if (!gamepad1.dpad_right) {
                 telemetry.update();
-            }
+//            }
 
             // Pace this loop so commands move at a reasonable speed.
-            sleep(utilRobotConstants.CommonSettings.SLEEP_TIMER_MILLISECONDS_DEFAULT);
+//            sleep(utilRobotConstants.CommonSettings.SLEEP_TIMER_MILLISECONDS_DEFAULT);
         }
 
         // ------------------------------------------------------------

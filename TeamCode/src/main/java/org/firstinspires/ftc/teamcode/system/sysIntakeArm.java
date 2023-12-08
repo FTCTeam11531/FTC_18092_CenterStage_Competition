@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.utility.utilRobotConstants;
 
@@ -30,13 +31,14 @@ public class sysIntakeArm {
 
     private LinearOpMode sysOpMode = null;
 
-    private DcMotorEx stageOneIntake, stageTwoIntake, leftSideArm, rightSideArm;
+    private DcMotorEx pivotIntake, stageOneIntake, stageTwoIntake, leftSideArm, rightSideArm;
     private List<DcMotorEx> listMotorsIntake, listMotorsArm;
 
     private Servo slotOneIntakeServo, slotTwoIntakeServo, pivotIntakeServo, droneLaunchServo, dronePivotServo;
 //    private CRServo sweeperLeftIntakeServo, sweeperRightIntakeServo;
 
     private DistanceSensor limitSlotOneSensor, limitSlotTwoSensor;
+    private TouchSensor limitArmLowerSensor;
 
     public sysIntakeArm(LinearOpMode inOpMode) {
         sysOpMode = inOpMode;
@@ -45,23 +47,27 @@ public class sysIntakeArm {
     public void init() {
 
         // Intake
+        pivotIntake = sysOpMode.hardwareMap.get(DcMotorEx.class, utilRobotConstants.Configuration.LABEL_INTAKE_MOTOR_PIVOT);
 //        stageOneIntake = sysOpMode.hardwareMap.get(DcMotorEx.class, utilRobotConstants.Configuration.LABEL_INTAKE_MOTOR_STAGE_ONE);
 //        stageTwoIntake = sysOpMode.hardwareMap.get(DcMotorEx.class, utilRobotConstants.Configuration.LABEL_INTAKE_MOTOR_STAGE_TWO);
 
         // Add Intake motors to array
 //        listMotorsIntake = Arrays.asList(stageOneIntake, stageTwoIntake);
+        listMotorsIntake = Arrays.asList(pivotIntake);
 
         // Intake Servo
 //        sweeperLeftIntakeServo = sysOpMode.hardwareMap.get(CRServo.class, utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SWEEPER_LEFT);
 //        sweeperRightIntakeServo = sysOpMode.hardwareMap.get(CRServo.class, utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SWEEPER_RIGHT);
         slotOneIntakeServo = sysOpMode.hardwareMap.get(Servo.class, utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_ONE);
         slotTwoIntakeServo = sysOpMode.hardwareMap.get(Servo.class, utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO);
-        pivotIntakeServo = sysOpMode.hardwareMap.get(Servo.class, utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT);
+//        pivotIntakeServo = sysOpMode.hardwareMap.get(Servo.class, utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT);
         droneLaunchServo = sysOpMode.hardwareMap.get(Servo.class, utilRobotConstants.Configuration.LABEL_DRONE_LAUNCH_SERVO_MAIN);
         dronePivotServo = sysOpMode.hardwareMap.get(Servo.class, utilRobotConstants.Configuration.LABEL_DRONE_PIVOT_SERVO_MAIN);
 
-        limitSlotOneSensor = sysOpMode.hardwareMap.get(DistanceSensor.class, utilRobotConstants.Configuration.LABEL_INTAKE_SENSOR_SLOT_ONE);
-        limitSlotTwoSensor = sysOpMode.hardwareMap.get(DistanceSensor.class, utilRobotConstants.Configuration.LABEL_INTAKE_SENSOR_SLOT_TWO);
+//        limitSlotOneSensor = sysOpMode.hardwareMap.get(DistanceSensor.class, utilRobotConstants.Configuration.LABEL_INTAKE_SENSOR_SLOT_ONE);
+//        limitSlotTwoSensor = sysOpMode.hardwareMap.get(DistanceSensor.class, utilRobotConstants.Configuration.LABEL_INTAKE_SENSOR_SLOT_TWO);
+
+        limitArmLowerSensor = sysOpMode.hardwareMap.get(TouchSensor.class, utilRobotConstants.Configuration.LABEL_ARM_SENSOR_LIMIT_LOWER);
 
         // Arm
         leftSideArm = sysOpMode.hardwareMap.get(DcMotorEx.class, utilRobotConstants.Configuration.LABEL_ARM_MOTOR_LEFT_SIDE);
@@ -71,18 +77,21 @@ public class sysIntakeArm {
         listMotorsArm = Arrays.asList(leftSideArm, rightSideArm);
 
         // Configuration / Initialize Hardware
+//        pivotIntake.setDirection(DcMotorEx.Direction.REVERSE);
 //        stageOneIntake.setDirection(DcMotorEx.Direction.REVERSE);
 //        stageTwoIntake.setDirection(DcMotorEx.Direction.REVERSE);
 
         leftSideArm.setDirection(DcMotorEx.Direction.FORWARD);
         rightSideArm.setDirection(DcMotorEx.Direction.REVERSE);
 
-//        setIntakeMotorZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        setIntakeMotorZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         setArmMotorZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        resetArm();
+
+        resetArmEncoder();
+        resetIntakeEncoder();
 
 //        sweeperIntakeServo.setPower(utilRobotConstants.IntakeArm.SERVO_INTAKE_SWEEPER_SETPOINT_INIT);
-        pivotIntakeServo.setPosition(utilRobotConstants.IntakeArm.SERVO_PIVOT_SETPOINT_HOME);
+//        pivotIntakeServo.setPosition(utilRobotConstants.IntakeArm.SERVO_PIVOT_SETPOINT_HOME);
         slotOneIntakeServo.setPosition(utilRobotConstants.IntakeArm.SERVO_SLOTONE_SETPOINT_INIT);
         slotTwoIntakeServo.setPosition(utilRobotConstants.IntakeArm.SERVO_SLOTTWO_SETPOINT_INIT);
 
@@ -108,7 +117,14 @@ public class sysIntakeArm {
         setIntakeMotorPower(0);
     }
 
-    public void resetArm() {
+    public void resetArmEncoder() {
+
+        // Reset encoder
+        setArmMotorRunMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        setArmMotorPower(0);
+    }
+
+    public void resetIntakeEncoder() {
 
         // Reset encoder
         setArmMotorRunMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -135,6 +151,26 @@ public class sysIntakeArm {
         setArmMotorPower((inAppliedPower * inMaxOutputPowerPercent));
     }
 
+    public void moveIntakeToTarget(int inTargetSetPoint, double inMaxOutputPowerPercent) {
+
+        // Configure Motor Target Set Point and Set motor as Run to Position
+        setIntakeTargetPosition(inTargetSetPoint);
+        setIntakeMotorRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // Move linear slide within min/max limits
+        setIntakeMotorPower(inMaxOutputPowerPercent);
+
+    }
+
+    public void moveIntakeManually(double inAppliedPower, double inMaxOutputPowerPercent) {
+
+        // Configure Motor Target Set Point and Set motor as Run to Position
+        setIntakeMotorRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        // Move linear slide within min/max limits
+        setIntakeMotorPower((inAppliedPower * inMaxOutputPowerPercent));
+    }
+
     public double getIntakeServoPosition(String inIntakeServoName) {
         double outPosition;
 
@@ -145,9 +181,9 @@ public class sysIntakeArm {
             case(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO):
                 outPosition = slotTwoIntakeServo.getPosition();
                 break;
-            case(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT):
-                outPosition = pivotIntakeServo.getPosition();
-                break;
+//            case(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT):
+//                outPosition = pivotIntakeServo.getPosition();
+//                break;
             case(utilRobotConstants.Configuration.LABEL_DRONE_LAUNCH_SERVO_MAIN):
                 outPosition = droneLaunchServo.getPosition();
                 break;
@@ -181,6 +217,23 @@ public class sysIntakeArm {
         return outDistance;
     }
 
+    public boolean getLimitSensorTripped(String inSensorLabel) {
+        boolean outLimitSensorTripped = false;
+
+        // Get boolean value from Touch Sensor
+        switch (inSensorLabel) {
+            // Arm Limit Ground Sensor
+            case utilRobotConstants.Configuration.LABEL_ARM_SENSOR_LIMIT_LOWER:
+                outLimitSensorTripped = limitArmLowerSensor.isPressed();
+                break;
+            // Default - No match
+            default:
+                outLimitSensorTripped = false;
+        }
+
+        return outLimitSensorTripped;
+    }
+
     public int getArmCurrentPosition(String inMotorLabel) {
         // Variable for output Power value for drivetrain motor(s)
         int outEncoderPosition;
@@ -204,6 +257,25 @@ public class sysIntakeArm {
         return outEncoderPosition;
     }
 
+    public int getIntakeCurrentPosition(String inMotorLabel) {
+        // Variable for output Power value for drivetrain motor(s)
+        int outEncoderPosition;
+
+        // Get value for motor specified in method call
+        switch (inMotorLabel) {
+            // Intake Motor - Pivot
+            case utilRobotConstants.Configuration.LABEL_INTAKE_MOTOR_PIVOT:
+                outEncoderPosition = pivotIntake.getCurrentPosition();
+                break;
+            // Default - No match
+            default:
+                outEncoderPosition = 0;
+        }
+
+        // Return value
+        return outEncoderPosition;
+    }
+
     public void setIntakeServoPosition(String inIntakeServoName, double inTargetPosition) {
 
         switch(inIntakeServoName) {
@@ -213,9 +285,9 @@ public class sysIntakeArm {
             case(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_SLOT_TWO):
                 slotTwoIntakeServo.setPosition(inTargetPosition);
                 break;
-            case(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT):
-                pivotIntakeServo.setPosition(inTargetPosition);
-                break;
+//            case(utilRobotConstants.Configuration.LABEL_INTAKE_SERVO_PIVOT):
+//                pivotIntakeServo.setPosition(inTargetPosition);
+//                break;
             case(utilRobotConstants.Configuration.LABEL_DRONE_LAUNCH_SERVO_MAIN):
                 droneLaunchServo.setPosition(inTargetPosition);
                 break;
@@ -242,8 +314,20 @@ public class sysIntakeArm {
         }
     }
 
+    public void setIntakeTargetPosition(int inTargetPosition) {
+        for (DcMotorEx itemMotor: listMotorsIntake) {
+            itemMotor.setTargetPosition(inTargetPosition);
+        }
+    }
+
     public void setArmMotorRunMode(DcMotorEx.RunMode inRunMode) {
         for (DcMotorEx itemMotor: listMotorsArm) {
+            itemMotor.setMode(inRunMode);
+        }
+    }
+
+    public void setIntakeMotorRunMode(DcMotorEx.RunMode inRunMode) {
+        for (DcMotorEx itemMotor: listMotorsIntake) {
             itemMotor.setMode(inRunMode);
         }
     }

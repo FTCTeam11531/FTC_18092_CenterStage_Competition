@@ -100,15 +100,16 @@ public class utilRobotConstants {
         public static final String LABEL_INTAKE_SERVO_SWEEPER_RIGHT = "sweeper_right_intake_servo";
         public static final String LABEL_INTAKE_SERVO_SLOT_ONE = "slot_one_servo_intake";
         public static final String LABEL_INTAKE_SERVO_SLOT_TWO = "slot_two_servo_intake";
-        public static final String LABEL_INTAKE_SERVO_PIVOT = "pivot_intake";
 
         public static final String LABEL_INTAKE_SENSOR_SLOT_ONE = "slot_one_sensor_intake";
         public static final String LABEL_INTAKE_SENSOR_SLOT_TWO = "slot_two_sensor_intake";
         public static final String LABEL_INTAKE_SENSOR_TRACKING = "intake_tracker_sensor";
+        public static final String LABEL_ARM_SENSOR_LIMIT_LOWER = "arm_sensor_lower_limit";
 
         // Arm
         public static final String LABEL_ARM_MOTOR_LEFT_SIDE = "left_side_arm";
         public static final String LABEL_ARM_MOTOR_RIGHT_SIDE = "right_side_arm";
+        public static final String LABEL_INTAKE_MOTOR_PIVOT = "pivot_intake";
 
         // Endgame - Drone
         public static final String LABEL_DRONE_LAUNCH_SERVO_MAIN = "drone_launch_servo";
@@ -241,6 +242,11 @@ public class utilRobotConstants {
         public static final double MOTOR_OUTPUT_POWER_LOW = 0.40;
         public static final double MOTOR_OUTPUT_POWER_SNAIL = 0.25;
 
+        // Sensor Settings
+        public static final double SENSOR_COLLISION_LEFT_BOARD_RANGE = 3.5;
+        public static final double SENSOR_COLISION_RIGHT_BOARD_RANGE = SENSOR_COLLISION_LEFT_BOARD_RANGE;
+        public static final DistanceUnit LIMIT_SENSOR_DISTANCE_UNIT = DistanceUnit.INCH;
+
         /**
          * <h2>Convert: Encoder Ticks to Inches</h2>
          * <hr>
@@ -337,19 +343,16 @@ public class utilRobotConstants {
 
         // Servo Settings - Pivot
         public static final double SERVO_PIVOT_SETPOINT_HOME = 0.5;
-        public static final double SERVO_PIVOT_SETPOINT_TRAVEL = 1.0;
+        public static final double SERVO_PIVOT_SETPOINT_TRAVEL = 0.8;
         public static final double SERVO_PIVOT_SETPOINT_BOARD = 1.0;
 
         // Servo Settings - Pixel Slot
-        public static final double SERVO_SLOTONE_SETPOINT_INIT = 1.0;
-        public static final double SERVO_SLOTONE_SETPOINT_OPEN = 0.5;
-
-        public static final double SERVO_SLOTONE_SETPOINT_CLOSE = 1.0;
-
-        public static final double SERVO_SLOTTWO_SETPOINT_INIT = 0.0;
-        public static final double SERVO_SLOTTWO_SETPOINT_OPEN = 0.5;
-
-        public static final double SERVO_SLOTTWO_SETPOINT_CLOSE = 0.0;
+        public static final double SERVO_SLOTONE_SETPOINT_INIT = 0.5;
+        public static final double SERVO_SLOTONE_SETPOINT_OPEN = 1; // open is now 1
+        public static final double SERVO_SLOTONE_SETPOINT_CLOSE = 0.5; // close is now 0.5
+        public static final double SERVO_SLOTTWO_SETPOINT_INIT = 0.5;
+        public static final double SERVO_SLOTTWO_SETPOINT_OPEN = 0; // open is now 0
+        public static final double SERVO_SLOTTWO_SETPOINT_CLOSE = 0.5; // close is now 0.5
 
         // Servo Settings - Endgame - Drone
         public static final double SERVO_DRONE_LAUNCH_SETPOINT_INIT = 0;
@@ -357,7 +360,7 @@ public class utilRobotConstants {
         public static final double SERVO_DRONE_LAUNCH_SETPOINT_CLOSE = 0;
 
         public static final double SERVO_DRONE_PIVOT_SETPOINT_INIT = 0.50;
-        public static final double SERVO_DRONE_PIVOT_SETPOINT_LAUNCH = 0.70;
+        public static final double SERVO_DRONE_PIVOT_SETPOINT_LAUNCH = 0;
 
         // Arm Settings
         public static final double ARM_MOTOR_OUTPUT_POWER_MAX = 1.0;
@@ -367,8 +370,21 @@ public class utilRobotConstants {
         public static final int ARM_ENCODER_SETPOINT_HOME = 0;
         public static final int ARM_ENCODER_SETPOINT_MAX = 8200;
         public static final int ARM_ENCODER_SETPOINT_CRUISE = 800;
-        public static final int ARM_ENCODER_SETPOINT_PRECLIMB = 4500;
+        public static final int ARM_ENCODER_SETPOINT_AUTOPIXEL = 4370;
+        public static final int ARM_ENCODER_SETPOINT_PRECLIMB = 4800; // was 4500
         public static final int ARM_ENCODER_SETPOINT_HANG = 1200;
+
+        // Intake Settings
+        public static final double INTAKE_MOTOR_OUTPUT_POWER_MAX = 1.0;
+        public static final double INTAKE_MOTOR_OUTPUT_POWER_MIN = 0.65;
+
+        // Intake - Setpoints
+        public static final int INTAKE_ENCODER_SETPOINT_HOME = 0;
+        public static final int INTAKE_ENCODER_SETPOINT_MAX = 120;
+        public static final int INTAKE_ENCODER_SETPOINT_TRAVEL = 40;
+        public static final int INTAKE_ENCODER_SETPOINT_BOARD = 100;
+        public static final int INTAKE_ENCODER_SETPOINT_AUTOPIXEL = 100;
+
     }
 
     /**
